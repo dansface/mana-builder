@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MTG Limited Land Calculator</title>
+    <style>
+        :root {
+            --w: #fdf5d3; 
+            --u: #d3e7fd; 
+            --b: #e2e2e2;
+            --r: #fdd3d3; 
+            --g: #d3fdd3; 
+            --c: #fafafa;
+            --accent: #4361ee;
+            --bg: #f4f4f9;
+            --container-bg: #ffffff;
+            --text-main: #2c3e50;
+            --text-secondary: #6c757d;
+            --section-bg: #f8f9fa;
+            --border: #e9ecef;
+            --input-bg: #ffffff;
+        }
+
+        [data-theme="dark"] {
+            --w: #4d4629; 
+            --u: #293d4d; 
+            --b: #2d2d2d;
+            --r: #4d2929; 
+            --g: #294d29; 
+            --c: #333333;
+            --bg: #121212;
+            --container-bg: #1e1e1e;
+            --text-main: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --section-bg: #252525;
+            --border: #333333;
+            --input-bg: #333333;
+        }
+
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: var(--bg); 
+            color: var(--text-main); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 2rem; 
+            margin: 0; 
+            transition: background 0.3s, color 0.3s; 
+        }
+        
+        .theme-toggle-container { 
+            width: 100%; 
+            max-width: 700px; 
+            display: flex; 
+            justify-content: flex-end; 
+            margin-bottom: 1rem; 
+        }
+
+        #theme-toggle { 
+            background: var(--section-bg); 
+            border: 1px solid var(--border); 
+            color: var(--text-main); 
+            padding: 5px 15px; 
+            border-radius: 20px; 
+            cursor: pointer; 
+            font-size: 0.8rem; 
+            font-weight: bold; 
+        }
+
+        .calculator-container { 
+            background: var(--container-bg); 
+            padding: 2rem; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            width: 100%; 
+            max-width: 700px; 
+            border: 1px solid var(--border); 
+        }
+
+        h1 { 
+            text-align: center; 
+            color: var(--text-main); 
+            font-size: 1.5rem; 
+            margin-top: 0; 
+        }
+        
+        .section { 
+            margin-bottom: 1.5rem; 
+            padding: 1rem; 
+            border-radius: 8px; 
+            background: var(--section-bg); 
+            border: 1px solid var(--border); 
+        }
+
+        .section h2 { 
+            font-size: 0.8rem; 
+            margin-top: 0; 
+            margin-bottom: 1rem; 
+            color: var(--text-secondary); 
+            border-bottom: 1px solid var(--border); 
+            padding-bottom: 0.4rem; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+        }
+        
+        .grid-layout { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
+            gap: 10px; 
+        }
+
+        .color-dot { 
+            width: 10px; 
+            height: 10px; 
+            border-radius: 50%; 
+            display: inline-block; 
+            margin-right: 3px; 
+            border: 1px solid rgba(0,0,0,0.2); 
+        }
+
+        .dot-W { background: #f6e652; } 
+        .dot-U { background: #3498db; } 
+        .dot-B { background: #2c3e50; } 
+        .dot-R { background: #e74c3c; } 
+        .dot-G { background: #27ae60; }
+
+        label { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 8px 10px; 
+            border-radius: 4px; 
+            border: 1px solid var(--border); 
+            transition: all 0.2s; 
+            color: var(--text-main); 
+        }
+
+        label:hover { 
+            border-color: var(--accent); 
+            transform: translateY(-1px); 
+        }
+        
+        .name-stack { 
+            display: flex; 
+            flex-direction: column; 
+            line-height: 1.3; 
+        }
+
+        .flavor-name { 
+            font-weight: bold; 
+            font-size: 0.75rem; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px; 
+            text-shadow: 0 1px 0px rgba(255,255,255,0.3); 
+        }
+
+        [data-theme="dark"] .flavor-name { 
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5); 
+        }
+        
+        .dot-container { 
+            display: flex; 
+            align-items: center; 
+            margin-top: 2px; 
+        }
+
+        input[type="number"] { 
+            width: 35px; 
+            padding: 2px; 
+            border: 1px solid rgba(0,0,0,0.2); 
+            border-radius: 4px; 
+            text-align: right; 
+            font-weight: bold; 
+            outline: none; 
+            background: rgba(255,255,255,0.85); 
+            color: #000; 
+        }
+
+        [data-theme="dark"] input[type="number"] {
+            background: rgba(0,0,0,0.6);
+            color: #fff;
+            border-color: rgba(255,255,255,0.2);
+        }
+
+        input[type="number"]:focus { 
+            border-color: var(--accent); 
+            background: var(--input-bg); 
+        }
+        
+        .w-row { background: var(--w) !important; border-left: 4px solid #fbc02d; }
+        .u-row { background: var(--u) !important; border-left: 4px solid #1976d2; }
+        .b-row { background: var(--b) !important; border-left: 4px solid #424242; }
+        .r-row { background: var(--r) !important; border-left: 4px solid #d32f2f; }
+        .g-row { background: var(--g) !important; border-left: 4px solid #388e3c; }
+        .c-row { background: var(--c) !important; border-left: 4px solid #9e9e9e; }
+
+        .btn-group { 
+            display: flex; 
+            gap: 10px; 
+            margin-top: 1rem; 
+        }
+
+        .btn-submit { 
+            flex: 2; 
+            padding: 0.8rem; 
+            background: var(--accent); 
+            color: white; 
+            border: none; 
+            border-radius: 6px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            font-size: 1rem; 
+        }
+
+        .btn-reset { 
+            flex: 1; 
+            padding: 0.8rem; 
+            background: #adb5bd; 
+            color: white; 
+            border: none; 
+            border-radius: 6px; 
+            font-weight: bold; 
+            cursor: pointer; 
+        }
+        
+        details { 
+            background: var(--container-bg); 
+            border: 1px solid var(--border); 
+            border-radius: 6px; 
+            margin-bottom: 0.6rem; 
+            color: var(--text-main); 
+        }
+
+        summary { 
+            padding: 10px; 
+            font-weight: bold; 
+            font-size: 0.85rem; 
+            cursor: pointer; 
+            color: var(--text-secondary); 
+        }
+
+        .error-message { 
+            color: #d32f2f; 
+            background: #ffebee; 
+            padding: 1rem; 
+            border-radius: 6px; 
+            margin-top: 1rem; 
+            display: none; 
+            border: 1px solid #ef9a9a; 
+        }
+
+        .error-message ul { 
+            margin: 0; 
+            padding-left: 1.25rem; 
+        }
+
+        .results-section { 
+            margin-top: 1.5rem; 
+            padding: 1.5rem; 
+            background: var(--section-bg); 
+            border: 1px solid var(--accent); 
+            border-radius: 8px; 
+            display: none; 
+        }
+
+        .result-item { 
+            display: flex; 
+            justify-content: space-between; 
+            padding: 0.5rem 0; 
+            border-bottom: 1px solid var(--border); 
+            align-items: center; 
+        }
+
+        .result-count { 
+            font-weight: bold; 
+            color: var(--accent); 
+            font-size: 1.5rem; 
+        }
+
+        .decimal-hint { 
+            font-size: 0.75rem; 
+            color: var(--text-secondary); 
+            margin-left: 8px; 
+            font-weight: normal; 
+        }
+        .footer-note {
+            font-size: 0.7rem;
+            text-align: center;
+            margin-top: 2rem;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="theme-toggle-container">
+        <button id="theme-toggle">🌙 Dark Mode</button>
+    </div>
+
+    <div class="calculator-container">
+        <h1>MTG Manabase Builder</h1>
+
+        <div class="section">
+            <h2>1. Deck Requirements</h2>
+            <label style="background:transparent; border:none; padding:0;">
+                Total Land Slots: 
+                <input type="number" id="total-lands" value="17" min="1">
+            </label>
+        </div>
+
+        <div class="section">
+            <h2>2. Mana Pips</h2>
+            <div class="grid-layout">
+                <label class="w-row">White: <input type="number" id="p-w" value="" min="0"></label>
+                <label class="u-row">Blue: <input type="number" id="p-u" value="" min="0"></label>
+                <label class="b-row">Black: <input type="number" id="p-b" value="" min="0"></label>
+                <label class="r-row">Red: <input type="number" id="p-r" value="" min="0"></label>
+                <label class="g-row">Green: <input type="number" id="p-g" value="" min="0"></label>
+                <label class="c-row">Colorless: <input type="number" id="p-c" value="" min="0"></label>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>3. Non-Basic Lands</h2>
+            
+            <details id="details-duals">
+                <summary>Duals (Guilds)</summary>
+                <div class="grid-layout" style="padding:10px" id="duals-grid"></div>
+            </details>
+            
+            <details id="details-tris">
+                <summary>Tris (Shards & Wedges)</summary>
+                <div class="grid-layout" style="padding:10px" id="tris-grid"></div>
+            </details>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn-submit" id="calculate-btn">Calculate Basics</button>
+            <button class="btn-reset" id="reset-btn">Reset</button>
+        </div>
+
+        <div id="error-container" class="error-message"></div>
+
+        <div id="results-container" class="results-section">
+            <h2 style="color: var(--accent); border-bottom: none; margin-top: 0; font-size: 1rem;">
+                Suggested Basics
+            </h2>
+            <div id="results-list"></div>
+        </div>
+        <div class="footer-note">© 2026 Daniel Hoover • MTG Manabase Builder v1.0</div>
+    </div>
+
+    <script>
+        // --- CONSTANTS ---
+        const BORDER_MAP = {
+            w: '#fbc02d', 
+            u: '#1976d2', 
+            b: '#424242', 
+            r: '#d32f2f', 
+            g: '#388e3c', 
+            c: '#9e9e9e'
+        };
+
+        const DUALS = {
+            'wu': { n: 'Azorius', c: ['W', 'U'] }, 
+            'ub': { n: 'Dimir', c: ['U', 'B'] }, 
+            'br': { n: 'Rakdos', c: ['B', 'R'] }, 
+            'rg': { n: 'Gruul', c: ['R', 'G'] }, 
+            'gw': { n: 'Selesnya', c: ['G', 'W'] }, 
+            'wb': { n: 'Orzhov', c: ['W', 'B'] }, 
+            'ur': { n: 'Izzet', c: ['U', 'R'] }, 
+            'bg': { n: 'Golgari', c: ['B', 'G'] }, 
+            'rw': { n: 'Boros', c: ['R', 'W'] }, 
+            'gu': { n: 'Simic', c: ['G', 'U'] }
+        };
+
+        const TRIS = {
+            'wub': { n: 'Esper', c: ['W', 'U', 'B'] }, 
+            'ubr': { n: 'Grixis', c: ['U', 'B', 'R'] }, 
+            'brg': { n: 'Jund', c: ['B', 'R', 'G'] }, 
+            'rgw': { n: 'Naya', c: ['R', 'G', 'W'] }, 
+            'gwu': { n: 'Bant', c: ['G', 'W', 'U'] }, 
+            'wbg': { n: 'Abzan', c: ['W', 'B', 'G'] }, 
+            'urw': { n: 'Jeskai', c: ['U', 'R', 'W'] }, 
+            'bgu': { n: 'Sultai', c: ['B', 'G', 'U'] }, 
+            'rwb': { n: 'Mardu', c: ['R', 'W', 'B'] }, 
+            'gur': { n: 'Temur', c: ['G', 'U', 'R'] }
+        };
+
+        const ALL_NB = { ...DUALS, ...TRIS };
+
+        // --- THEME ---
+        const themeBtn = document.getElementById('theme-toggle');
+        
+        const setUITheme = (theme) => {
+            if (theme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeBtn.innerText = '☀️ Light Mode';
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+                themeBtn.innerText = '🌙 Dark Mode';
+            }
+        };
+
+        setUITheme(localStorage.getItem('theme'));
+
+        themeBtn.addEventListener('click', () => {
+            const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            setUITheme(newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+
+        // --- PERSISTENCE ---
+        const saveState = () => {
+            const state = {
+                total: parseInt(document.getElementById('total-lands').value, 10) || 17,
+                pips: {},
+                nb: {}
+            };
+
+            ['w', 'u', 'b', 'r', 'g', 'c'].forEach(color => {
+                const el = document.getElementById(`p-${color}`);
+                if (el) {
+                    const val = parseInt(el.value, 10) || 0;
+                    if (val > 0) {
+                        state.pips[color] = val;
+                    }
+                }
+            });
+
+            document.querySelectorAll('.nb-input').forEach(i => { 
+                const val = parseInt(i.value, 10) || 0;
+                if (val > 0) {
+                    state.nb[i.id] = val; 
+                }
+            });
+
+            localStorage.setItem('mtg_deck_state', JSON.stringify(state));
+        };
+
+        const loadState = () => {
+            const raw = localStorage.getItem('mtg_deck_state');
+            if (!raw) {
+                return;
+            }
+
+            try {
+                const s = JSON.parse(raw);
+                document.getElementById('total-lands').value = s.total;
+
+                ['w', 'u', 'b', 'r', 'g', 'c'].forEach(color => {
+                    const el = document.getElementById(`p-${color}`);
+                    if (el) {
+                        el.value = s.pips[color] || ""; 
+                    }
+                });
+
+                let hasDuals = false;
+                let hasTris = false;
+
+                for (const [id, v] of Object.entries(s.nb || {})) { 
+                    const el = document.getElementById(id); 
+                    if (el) {
+                        el.value = v;
+                        const shortId = id.replace('nb-', '');
+                        
+                        if (DUALS[shortId]) {
+                            hasDuals = true;
+                        }
+                        if (TRIS[shortId]) {
+                            hasTris = true;
+                        }
+                    }
+                }
+
+                if (hasDuals) {
+                    document.getElementById('details-duals').open = true;
+                }
+                if (hasTris) {
+                    document.getElementById('details-tris').open = true;
+                }
+                if (Object.values(s.pips || {}).some(v => v > 0)) {
+                    calculate(false); 
+                }
+            } catch (e) { 
+                console.error("Load failed", e); 
+            }
+        };
+
+        // --- UI POPULATION ---
+        function populate(gridId, config) {
+            const grid = document.getElementById(gridId);
+            if (!grid) {
+                return; 
+            }
+
+            for (const [id, data] of Object.entries(config)) {
+                const label = document.createElement('label');
+                const cssVars = data.c.map(c => 'var(--' + String(c).toLowerCase() + ')');
+                
+                label.style.background = 'linear-gradient(135deg, ' + cssVars.join(', ') + ')';
+                label.style.borderLeft = '4px solid ' + BORDER_MAP[String(data.c).toLowerCase()];
+                
+                label.innerHTML = `
+                    <div class="name-stack">
+                        <span class="flavor-name">${data.n}</span>
+                        <div class="dot-container">
+                            ${data.c.map(c => `<span class="color-dot dot-${c}"></span>`).join('')}
+                        </div>
+                    </div>
+                    <input type="number" id="nb-${id}" value="" min="0" class="nb-input">
+                `;
+                
+                grid.appendChild(label);
+            }
+        }
+
+        populate('duals-grid', DUALS); 
+        populate('tris-grid', TRIS);
+
+        // --- CALCULATIONS ---
+        function calculate(shouldSave = true) {
+            const err = document.getElementById('error-container');
+            const res = document.getElementById('results-container');
+            const list = document.getElementById('results-list');
+            
+            err.style.display = 'none'; 
+            res.style.display = 'none';
+
+            const total = parseInt(document.getElementById('total-lands').value, 10) || 0;
+            
+            const pips = {
+                W: parseInt(document.getElementById('p-w').value, 10) || 0, 
+                U: parseInt(document.getElementById('p-u').value, 10) || 0, 
+                B: parseInt(document.getElementById('p-b').value, 10) || 0, 
+                R: parseInt(document.getElementById('p-r').value, 10) || 0, 
+                G: parseInt(document.getElementById('p-g').value, 10) || 0, 
+                C: parseInt(document.getElementById('p-c').value, 10) || 0
+            };
+            
+            const totalPips = Object.values(pips).reduce((a, b) => a + b, 0);
+            
+            let nbCount = 0;
+            document.querySelectorAll('.nb-input').forEach(i => {
+                nbCount += (parseInt(i.value, 10) || 0);
+            });
+
+            if (total <= 0 || totalPips <= 0 || nbCount > total) {
+                let msgs = [];
+                if (total <= 0) {
+                    msgs.push("Set total land slots.");
+                }
+                if (totalPips <= 0) {
+                    msgs.push("Enter mana pips.");
+                }
+                if (nbCount > total) {
+                    msgs.push("Non-basics exceed total slots.");
+                }
+                
+                err.innerHTML = `<ul>${msgs.map(m => `<li>${m}</li>`).join('')}</ul>`;
+                err.style.display = 'block'; 
+                return;
+            }
+
+            let calcs = [
+                { id: 'W', n: 'Plains' },
+                { id: 'U', n: 'Islands' },
+                { id: 'B', n: 'Swamps' },
+                { id: 'R', n: 'Mountains' },
+                { id: 'G', n: 'Forests' },
+                { id: 'C', n: 'Wastes' }
+            ].map(type => {
+                let adj = 0;
+                let nbSources = 0; // Track actual number of non-basics for splash protection
+                
+                for (let [id, data] of Object.entries(ALL_NB)) {
+                    let val = parseInt(document.getElementById(`nb-${id}`).value, 10) || 0;
+                    if (data.c.includes(type.id)) {
+                        adj += (val * (1 / data.c.length));
+                        nbSources += val; // Count as a whole source
+                    }
+                }
+                
+                return { 
+                    ...type, 
+                    adj, 
+                    nbSources,
+                    frac: Math.max(0, (pips[type.id] / totalPips * total) - adj) 
+                };
+            });
+
+            const toFill = total - nbCount;
+            
+            let final = calcs.map(c => {
+                let floor = Math.floor(c.frac);
+                let rem = c.frac % 1;
+                
+                // --- SPLASH PROTECTION ---
+                // If a color has pips but ends up with 0 basics and 0 non-basics,
+                // force at least 1 basic land so the splash is playable.
+                if (pips[c.id] > 0 && floor === 0 && c.nbSources === 0) {
+                    floor = 1;
+                    rem = 0; // Prevent double-dipping during the remainder distribution
+                }
+
+                return { 
+                    ...c, 
+                    floor, 
+                    rem 
+                };
+            });
+            
+            let diff = toFill - final.reduce((a, b) => a + b.floor, 0);
+            
+            if (diff > 0) {
+                final.sort((a, b) => b.rem - a.rem)
+                     .slice(0, diff)
+                     .forEach(c => {
+                         c.floor++;
+                     });
+            } else if (diff < 0) {
+                for(let i = 0; i < Math.abs(diff); i++) { 
+                    const sorted = final.filter(c => c.floor > 0)
+                                        .sort((a, b) => b.floor - a.floor);
+                    if (sorted.length > 0) {
+                        sorted.floor--; 
+                    }
+                }
+            }
+            
+            list.innerHTML = '';
+            final.sort((a, b) => a.n.localeCompare(b.n)).forEach(c => {
+                if (c.floor > 0 || pips[c.id] > 0) {
+                    list.innerHTML += `
+                        <div class="result-item">
+                            <span>${c.n} <span class="decimal-hint">(${c.frac.toFixed(1)})</span></span>
+                            <span class="result-count">${c.floor}</span>
+                        </div>
+                    `;
+                }
+            });
+            
+            res.style.display = 'block';
+            
+            if (shouldSave) {
+                saveState();
+            }
+        }
+
+        // --- LISTENERS ---
+        document.getElementById('calculate-btn').addEventListener('click', () => {
+            calculate(true);
+        });
+        
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            localStorage.removeItem('mtg_deck_state');
+            location.reload(); 
+        });
+        
+        window.addEventListener('load', loadState);
+    </script>
+</body>
+</html>
