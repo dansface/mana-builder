@@ -251,7 +251,17 @@
             border: 1px solid #ef9a9a; 
         }
 
-        .error-message ul { 
+        .warning-message { 
+            color: #856404; 
+            background: #fff3cd; 
+            padding: 1rem; 
+            border-radius: 6px; 
+            margin-top: 1rem; 
+            display: none; 
+            border: 1px solid #ffeeba; 
+        }
+
+        .error-message ul, .warning-message ul { 
             margin: 0; 
             padding-left: 1.25rem; 
         }
@@ -342,6 +352,7 @@
         </div>
 
         <div id="error-container" class="error-message"></div>
+        <div id="warning-container" class="warning-message"></div>
 
         <div id="results-container" class="results-section">
             <h2 style="color: var(--accent); border-bottom: none; margin-top: 0; font-size: 1rem;">
@@ -523,10 +534,12 @@
         // --- CALCULATIONS ---
         function calculate(shouldSave = true) {
             const err = document.getElementById('error-container');
+            const warn = document.getElementById('warning-container');
             const res = document.getElementById('results-container');
             const list = document.getElementById('results-list');
             
             err.style.display = 'none'; 
+            warn.style.display = 'none';
             res.style.display = 'none';
 
             const total = parseInt(document.getElementById('total-lands').value, 10) || 0;
@@ -648,6 +661,13 @@
                         sorted[0].floor--;
                     }
                 }
+            }
+                        
+            // --- VERIFICATION: Total Land Count ---
+            const computedTotal = final.reduce((a, b) => a + b.floor, 0) + nbCount;
+            if (computedTotal !== total) {
+                warn.innerHTML = `<ul><li>Warning: Rounding mismatch detected. Results may be slightly inaccurate.</li></ul>`;
+                warn.style.display = 'block';
             }
             
             list.innerHTML = '';
