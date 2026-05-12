@@ -593,15 +593,15 @@
 
             const toFill = total - nbCount;
             
+            // --- SPLASH PROTECTION: Ensure minimum 3 mana sources per splash color ---
             let final = calcs.map(c => {
                 let floor = Math.floor(c.frac);
                 let rem = c.frac % 1;
                 
-                // --- SPLASH PROTECTION ---
-                // If a color has pips but ends up with 0 basics and 0 non-basics,
-                // force at least 1 basic land so the splash is playable.
-                if (pips[c.id] > 0 && floor === 0 && c.nbSources === 0) {
-                    floor = 1;
+                // If color has pips but would get fewer than 3 basics, boost it (splash protection)
+                if (pips[c.id] > 0 && floor < 3) {
+                    const minBasicsNeeded = Math.max(0, 3 - c.nbSources);
+                    floor = Math.max(floor, minBasicsNeeded);
                     rem = 0; // Prevent double-dipping during the remainder distribution
                 }
 
@@ -614,6 +614,26 @@
             
             let diff = toFill - final.reduce((a, b) => a + b.floor, 0);
             
+            // --- VALIDATE SPLASH PROTECTION REQUIREMENTS ---
+            if (diff < 0) {
+                // Reduce primary colors one at a time, always reducing the current leader
+                for (let i = 0; i < Math.abs(diff); i++) {
+                    const reducible = final.filter(c => pips[c.id] > 0 && c.floor > 3);
+                    if (reducible.length === 0) break;
+                    
+                    // Find and reduce the color with the highest floor
+                    reducible.sort((a, b) => b.floor - a.floor);
+                    reducible[0].floor--;
+                }
+                
+                diff = toFill - final.reduce((a, b) => a + b.floor, 0);
+                if (diff < 0) {
+                    err.innerHTML = `<ul><li>The provided non-basics break the '3 minimum mana sources' requirement. Please adjust your non-basic selections or increase total land slots.</li></ul>`;
+                    err.style.display = 'block';
+                    return;
+                }
+            }
+            
             if (diff > 0) {
                 final.sort((a, b) => b.rem - a.rem)
                      .slice(0, diff)
@@ -625,7 +645,7 @@
                     const sorted = final.filter(c => c.floor > 0)
                                         .sort((a, b) => b.floor - a.floor);
                     if (sorted.length > 0) {
-                        sorted.floor--; 
+                        sorted[0].floor--;
                     }
                 }
             }
