@@ -412,10 +412,13 @@
             localStorage.setItem('theme', newTheme);
         });
 
+        // --- INPUT SANITIZATION ---
+        const ensureNonNegative = (value) => Math.max(0, parseInt(value, 10) || 0);
+
         // --- PERSISTENCE ---
         const saveState = () => {
             const state = {
-                total: parseInt(document.getElementById('total-lands').value, 10) || 17,
+                total: ensureNonNegative(document.getElementById('total-lands').value) || 17,
                 pips: {},
                 nb: {}
             };
@@ -423,7 +426,7 @@
             ['w', 'u', 'b', 'r', 'g', 'c'].forEach(color => {
                 const el = document.getElementById(`p-${color}`);
                 if (el) {
-                    const val = parseInt(el.value, 10) || 0;
+                    const val = ensureNonNegative(el.value);
                     if (val > 0) {
                         state.pips[color] = val;
                     }
@@ -431,7 +434,7 @@
             });
 
             document.querySelectorAll('.nb-input').forEach(i => { 
-                const val = parseInt(i.value, 10) || 0;
+                const val = ensureNonNegative(i.value);
                 if (val > 0) {
                     state.nb[i.id] = val; 
                 }
@@ -529,22 +532,22 @@
             err.style.display = 'none'; 
             res.style.display = 'none';
 
-            const total = parseInt(document.getElementById('total-lands').value, 10) || 0;
+            const total = ensureNonNegative(document.getElementById('total-lands').value);
             
             const pips = {
-                W: parseInt(document.getElementById('p-w').value, 10) || 0, 
-                U: parseInt(document.getElementById('p-u').value, 10) || 0, 
-                B: parseInt(document.getElementById('p-b').value, 10) || 0, 
-                R: parseInt(document.getElementById('p-r').value, 10) || 0, 
-                G: parseInt(document.getElementById('p-g').value, 10) || 0, 
-                C: parseInt(document.getElementById('p-c').value, 10) || 0
+                W: ensureNonNegative(document.getElementById('p-w').value),
+                U: ensureNonNegative(document.getElementById('p-u').value),
+                B: ensureNonNegative(document.getElementById('p-b').value),
+                R: ensureNonNegative(document.getElementById('p-r').value),
+                G: ensureNonNegative(document.getElementById('p-g').value),
+                C: ensureNonNegative(document.getElementById('p-c').value)
             };
             
             const totalPips = Object.values(pips).reduce((a, b) => a + b, 0);
             
             let nbCount = 0;
             document.querySelectorAll('.nb-input').forEach(i => {
-                nbCount += (parseInt(i.value, 10) || 0);
+                nbCount += ensureNonNegative(i.value);
             });
 
             if (total <= 0 || totalPips <= 0 || nbCount > total) {
@@ -576,7 +579,7 @@
                 let nbSources = 0; // Track actual number of non-basics for splash protection
                 
                 for (let [id, data] of Object.entries(ALL_NB)) {
-                    let val = parseInt(document.getElementById(`nb-${id}`).value, 10) || 0;
+                    let val = ensureNonNegative(document.getElementById(`nb-${id}`).value);
                     if (data.c.includes(type.id)) {
                         adj += (val * (1 / data.c.length));
                         nbSources += val; // Count as a whole source
