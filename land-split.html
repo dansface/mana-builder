@@ -606,6 +606,22 @@
 
             const toFill = total - nbCount;
             
+            // --- EARLY VALIDATION: Check if splash protection is even possible ---
+            const splashColors = calcs.filter(c => pips[c.id] > 0);
+            const minBasicsRequired = splashColors.reduce((sum, c) => {
+                const minBasicsNeeded = Math.max(0, 3 - c.nbSources);
+                return sum + minBasicsNeeded;
+            }, 0);
+            
+            if (minBasicsRequired > toFill) {
+                err.innerHTML = `<ul><li>Impossible configuration: Splash protection requires ${minBasicsRequired} basics, but only ${toFill} slots remain after non-basics. Reduce non-basics or increase total slots.</li></ul>`;
+                err.style.display = 'block';
+                if (typeof console !== 'undefined') {
+                    console.error(`[Rounding Check] Splash protection failure: need ${minBasicsRequired}, have ${toFill}`);
+                }
+                return;
+            }
+            
             // --- SPLASH PROTECTION: Ensure minimum 3 mana sources per splash color ---
             let final = calcs.map(c => {
                 let floor = Math.floor(c.frac);
@@ -643,6 +659,9 @@
                 if (diff < 0) {
                     err.innerHTML = `<ul><li>The provided non-basics break the '3 minimum mana sources' requirement. Please adjust your non-basic selections or increase total land slots.</li></ul>`;
                     err.style.display = 'block';
+                    if (typeof console !== 'undefined') {
+                        console.error(`[Rounding Check] Post-reduction mismatch: diff=${diff}, toFill=${toFill}`);
+                    }
                     return;
                 }
             }
@@ -662,12 +681,51 @@
                     }
                 }
             }
-                        
-            // --- VERIFICATION: Total Land Count ---
-            const computedTotal = final.reduce((a, b) => a + b.floor, 0) + nbCount;
+            
+            // --- VERIFICATION: Multiple Rounding Checks ---
+            const basicsTotal = final.reduce((a, b) => a + b.floor, 0);
+            const computedTotal = basicsTotal + nbCount;
+            
+            // Check 1: Basics + Non-basics equals total
             if (computedTotal !== total) {
-                warn.innerHTML = `<ul><li>Warning: Rounding mismatch detected. Results may be slightly inaccurate.</li></ul>`;
-                warn.style.display = 'block';
+                err.innerHTML = `<ul><li>Critical: Land count mismatch (${computedTotal} ≠ ${total}). Please report this bug.</li></ul>`;
+                err.style.display = 'block';
+                if (typeof console !== 'undefined') {
+                    console.error(`[Rounding Check] Total mismatch: computed=${computedTotal}, expected=${total}, basics=${basicsTotal}, nb=${nbCount}`);
+                }
+                return;
+            }
+            
+            // Check 2: Splash protection maintained
+            for (let c of final) {
+                if (pips[c.id] > 0) {
+                    const totalSources = c.floor + c.nbSources;
+                    if (totalSources < 3) {
+                        err.innerHTML = `<ul><li>Critical: ${c.n} has only ${totalSources} mana sources (needs 3+). Please report this bug.</li></ul>`;
+                        err.style.display = 'block';
+                        if (typeof console !== 'undefined') {
+                            console.error(`[Rounding Check] Splash protection violated for ${c.id}: sources=${totalSources}`);
+                        }
+                        return;
+                    }
+                }
+            }
+            
+            // Check 3: No color has negative basics
+            for (let c of final) {
+                if (c.floor < 0) {
+                    err.innerHTML = `<ul><li>Critical: ${c.n} has negative count (${c.floor}). Please report this bug.</li></ul>`;
+                    err.style.display = 'block';
+                    if (typeof console !== 'undefined') {
+                        console.error(`[Rounding Check] Negative floor for ${c.id}: ${c.floor}`);
+                    }
+                    return;
+                }
+            }
+            
+            // All checks passed
+            if (typeof console !== 'undefined') {
+                console.log(`[Rounding Check] All validations passed. Total=${total}, Basics=${basicsTotal}, NB=${nbCount}`);
             }
             
             list.innerHTML = '';
