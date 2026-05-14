@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - MTG Manabase Builder</title>
+    <style>
+        :root {
+            --w: #fdf5d3; 
+            --u: #d3e7fd; 
+            --b: #e2e2e2;
+            --r: #fdd3d3; 
+            --g: #d3fdd3; 
+            --c: #fafafa;
+            --accent: #4361ee;
+            --bg: #f4f4f9;
+            --container-bg: #ffffff;
+            --text-main: #2c3e50;
+            --text-secondary: #6c757d;
+            --section-bg: #f8f9fa;
+            --border: #e9ecef;
+            --input-bg: #ffffff;
+        }
+
+        [data-theme="dark"] {
+            --w: #4d4629; 
+            --u: #293d4d; 
+            --b: #2d2d2d;
+            --r: #4d2929; 
+            --g: #294d29; 
+            --c: #333333;
+            --bg: #121212;
+            --container-bg: #1e1e1e;
+            --text-main: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --section-bg: #252525;
+            --border: #333333;
+            --input-bg: #333333;
+        }
+
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: var(--bg); 
+            color: var(--text-main); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 2rem; 
+            margin: 0; 
+            transition: background 0.3s, color 0.3s; 
+        }
+
+        .theme-toggle-container { 
+            width: 100%; 
+            max-width: 700px; 
+            display: flex; 
+            justify-content: flex-end; 
+            margin-bottom: 1rem; 
+        }
+
+        #theme-toggle { 
+            background: var(--section-bg); 
+            border: 1px solid var(--border); 
+            color: var(--text-main); 
+            padding: 5px 15px; 
+            border-radius: 20px; 
+            cursor: pointer; 
+            font-size: 0.8rem; 
+            font-weight: bold; 
+        }
+
+        .container { 
+            background: var(--container-bg); 
+            padding: 2rem; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            width: 100%; 
+            max-width: 700px; 
+            border: 1px solid var(--border); 
+        }
+
+        h1 { 
+            text-align: center; 
+            color: var(--text-main); 
+            font-size: 1.5rem; 
+            margin-top: 0; 
+            margin-bottom: 2rem;
+        }
+
+        h2 { 
+            color: var(--accent); 
+            font-size: 1.1rem; 
+            margin-top: 1.5rem; 
+            margin-bottom: 0.8rem;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 0.5rem;
+        }
+
+        h2:first-of-type {
+            margin-top: 0;
+        }
+
+        p, li { 
+            line-height: 1.6; 
+            color: var(--text-main);
+            margin: 0.8rem 0;
+        }
+
+        ul {
+            margin: 0.8rem 0;
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        a {
+            color: var(--accent);
+            text-decoration: none;
+            border-bottom: 1px solid var(--accent);
+            transition: opacity 0.2s;
+        }
+
+        a:hover {
+            opacity: 0.8;
+        }
+
+        .back-link {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .footer-note {
+            font-size: 0.7rem;
+            text-align: center;
+            margin-top: 2rem;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="theme-toggle-container">
+        <button id="theme-toggle">🌙 Dark Mode</button>
+    </div>
+
+    <div class="container">
+        <h1>Privacy Policy</h1>
+
+        <h2>Serverless Architecture</h2>
+        <p>
+            The MTG Manabase Builder is a client-side web application. All calculations and data processing happen directly in your browser—nothing is sent to external servers. Your deck data (mana pips, land slots, and preferences) never leaves your device.
+        </p>
+
+        <h2>Local Storage</h2>
+        <p>
+            This application uses your browser's local storage to persistently save your work between sessions. Specifically, we store:
+        </p>
+        <ul>
+            <li><strong>Deck State:</strong> Your mana pip entries, total land slots, and non-basic land selections.</li>
+            <li><strong>User Preferences:</strong> Your choice of light or dark theme.</li>
+        </ul>
+        <p>
+            This data remains entirely on your device and under your control. You can clear it at any time by clearing your browser's local storage or clicking the "Reset" button in the calculator.
+        </p>
+
+        <h2>GitHub Pages Hosting</h2>
+        <p>
+            This site is hosted on <a href="https://pages.github.com/" target="_blank">GitHub Pages</a>. As with any web hosting, GitHub may collect basic server logs—such as your IP address and browser information—as part of standard web server operations and security monitoring. These logs are governed by <a href="https://docs.github.com/en/site-policy/privacy-policies/github-privacy-statement" target="_blank">GitHub's Privacy Statement</a> and are beyond the control of this application.
+        </p>
+
+        <h2>No Third Parties</h2>
+        <p>
+            This site uses:
+        </p>
+        <ul>
+            <li>✓ No advertisements</li>
+            <li>✓ No tracking pixels</li>
+            <li>✓ No third-party analytics (e.g., Google Analytics)</li>
+            <li>✓ No external APIs for data collection</li>
+        </ul>
+        <p>
+            The calculator is entirely self-contained and does not integrate with any external services beyond standard GitHub Pages hosting.
+        </p>
+
+        <div class="back-link">
+            <a href="land-split.html">← Back to Calculator</a>
+        </div>
+
+        <div class="footer-note">© 2026 Daniel Hoover • MTG Manabase Builder v1.0</div>
+    </div>
+
+    <script>
+        // --- THEME ---
+        const themeBtn = document.getElementById('theme-toggle');
+        
+        const setUITheme = (theme) => {
+            if (theme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeBtn.innerText = '☀️ Light Mode';
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+                themeBtn.innerText = '🌙 Dark Mode';
+            }
+        };
+
+        setUITheme(localStorage.getItem('theme'));
+
+        themeBtn.addEventListener('click', () => {
+            const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            setUITheme(newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

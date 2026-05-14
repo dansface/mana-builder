@@ -49,7 +49,7 @@
             margin: 0; 
             transition: background 0.3s, color 0.3s; 
         }
-        
+
         .theme-toggle-container { 
             width: 100%; 
             max-width: 700px; 
@@ -85,7 +85,7 @@
             font-size: 1.5rem; 
             margin-top: 0; 
         }
-        
+
         .section { 
             margin-bottom: 1.5rem; 
             padding: 1rem; 
@@ -104,7 +104,7 @@
             text-transform: uppercase; 
             letter-spacing: 1px; 
         }
-        
+
         .grid-layout { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
@@ -141,7 +141,7 @@
             border-color: var(--accent); 
             transform: translateY(-1px); 
         }
-        
+
         .name-stack { 
             display: flex; 
             flex-direction: column; 
@@ -159,7 +159,7 @@
         [data-theme="dark"] .flavor-name { 
             text-shadow: 0 1px 2px rgba(0,0,0,0.5); 
         }
-        
+
         .dot-container { 
             display: flex; 
             align-items: center; 
@@ -188,7 +188,7 @@
             border-color: var(--accent); 
             background: var(--input-bg); 
         }
-        
+
         .w-row { background: var(--w) !important; border-left: 4px solid #fbc02d; }
         .u-row { background: var(--u) !important; border-left: 4px solid #1976d2; }
         .b-row { background: var(--b) !important; border-left: 4px solid #424242; }
@@ -224,7 +224,7 @@
             font-weight: bold; 
             cursor: pointer; 
         }
-        
+
         details { 
             background: var(--container-bg); 
             border: 1px solid var(--border); 
@@ -285,11 +285,32 @@
             margin-left: 8px; 
             font-weight: normal; 
         }
+
         .footer-note {
             font-size: 0.7rem;
             text-align: center;
             margin-top: 2rem;
             opacity: 0.5;
+        }
+
+        .privacy-notice {
+            font-size: 0.65rem;
+            text-align: center;
+            margin-top: 0.4rem;
+            opacity: 0.7;
+            line-height: 1.4;
+            color: var(--text-secondary);
+        }
+
+        .privacy-notice a {
+            color: var(--accent);
+            text-decoration: none;
+            border-bottom: 1px solid var(--accent);
+            transition: opacity 0.2s;
+        }
+
+        .privacy-notice a:hover {
+            opacity: 0.8;
         }
     </style>
 </head>
@@ -349,7 +370,8 @@
             </h2>
             <div id="results-list"></div>
         </div>
-        <div class="footer-note">© 2026 Daniel Hoover • MTG Manabase Builder v1.0</div>
+        <div class="footer-note">© 2026 Daniel Hoover • MTG Manabase Builder v1.1.0</div>
+        <div class="privacy-notice">This site is serverless; your data stays on your device. <a href="privacy.html">Privacy Policy</a></div>
     </div>
 
     <script>
